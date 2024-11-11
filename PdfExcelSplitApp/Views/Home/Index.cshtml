@@ -1,0 +1,207 @@
+﻿@{
+    ViewData["Title"] = "PDF Splitter";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <!-- Add Google Fonts for stylish fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* Gradient Background */
+        body {
+            background: linear-gradient(to right, #00c6ff, #0072ff);
+            font-family: 'Roboto', sans-serif;
+            color: white;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+        }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.9); /* semi-transparent white background */
+            padding: 30px;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 800px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 700;
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-control {
+            font-size: 16px;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background-color: #0072ff;
+            border: none;
+            padding: 10px 20px;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+            .btn-primary:hover {
+                background-color: #005bb5;
+            }
+
+        .alert {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .alert-info {
+            background-color: #d9edf7;
+            color: #31708f;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Welcome to Avia Automation Tool for PDF</h2>
+        <h2>Avia Backend Team Innovations</h2>
+
+        @if (ViewBag.Message != null)
+        {
+            <div class="alert alert-info">
+                @ViewBag.Message
+            </div>
+        }
+
+        <form id="splitPdfForm" asp-controller="PdfSplit" asp-action="SplitPdf" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="pdfFile">Upload PDF</label>
+                <input type="file" class="form-control" name="pdfFile" id="pdfFile" />
+            </div>
+
+            <div class="form-group">
+                <label for="applicationNumbers">Enter Application Numbers (one per line)</label>
+                <textarea class="form-control" name="applicationNumbers" id="applicationNumbers" rows="10" placeholder="Enter one application number per line" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="outputFolder">Enter Output Folder Name</label>
+                <input type="text" class="form-control" name="outputFolder" id="outputFolder" placeholder="Enter a folder name to save the split PDFs" required />
+            </div>
+
+            <button type="submit" class="btn btn-primary">Split PDF</button>
+        </form>
+
+        <div id="successAlert" class="alert alert-success" style="display: none;">
+            PDF has been successfully split and saved with application numbers.
+        </div>
+
+        <div id="errorAlert" class="alert alert-danger" style="display: none;">
+            An error occurred while splitting the PDF.
+        </div>
+    </div>
+
+    @section Scripts {
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+            $(document).ready(function () {
+                // Function to handle form submission
+                $('#splitPdfForm').on('submit', function (e) {
+                    e.preventDefault(); // Prevent page reload
+
+                    // Get the input value and trim spaces
+                    var applicationNumbers = $('#applicationNumbers').val().trim();
+
+                    // Split the input into individual lines (numbers) and check for validation
+                    var numbers = applicationNumbers.split('\n');
+                    var valid = true;
+                    var errorMessage = "";
+
+                    // Check each number in the input
+                    for (var i = 0; i < numbers.length; i++) {
+                        var num = numbers[i].trim(); // Trim leading/trailing spaces from each line
+
+                        // Check if the number is only digits and not empty
+                        if (!/^[0-9]+$/.test(num)) {
+                            valid = false;
+                            errorMessage = "Each application number should contain only numbers and no spaces before or after.";
+                            break;
+                        }
+                    }
+
+                    // If the input is invalid, show an error
+                    if (!valid) {
+                        $('#errorAlert').text(errorMessage).show();
+                        $('#successAlert').hide();
+                        return;
+                    }
+
+                    // If valid, proceed with form submission via AJAX
+                    var formData = new FormData(this);
+
+                    $.ajax({
+                        url: '@Url.Action("SplitPdf", "PdfSplit")',
+                        type: 'POST',
+                        data: formData,
+                        success: function (response) {
+                            if (response.success) {
+                                $('#successAlert').text(response.message).show();
+                                $('#errorAlert').hide();
+                            } else {
+                                $('#errorAlert').text(response.message).show();
+                                $('#successAlert').hide();
+                            }
+                        },
+                        error: function () {
+                            $('#errorAlert').text("An error occurred while processing the request.").show();
+                            $('#successAlert').hide();
+                        },
+                        cache: false,
+                        contentType: false,
+                        processData: false
+                    });
+                });
+
+                // Trim spaces when the user finishes typing or when input changes
+                $('#applicationNumbers').on('input', function () {
+                    var input = $(this).val();
+                    var cleanInput = input.replace(/^\s+|\s+$/g, ''); // Remove spaces at the start and end
+                    $(this).val(cleanInput); // Update the textarea value
+                });
+            });
+        </script>
+
+    }
+</body>
+</html>
