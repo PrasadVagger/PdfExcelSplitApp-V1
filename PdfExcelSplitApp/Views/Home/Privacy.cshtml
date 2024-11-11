@@ -1,6 +1,52 @@
 ﻿@{
-    ViewData["Title"] = "Privacy Policy";
+    ViewData["Title"] = "How to Use PDF Splitter";
 }
 <h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<p>This page provides detailed instructions on how to use the PDF Splitter application, which splits PDF files based on application numbers entered by the user.</p>
+
+<div class="section">
+    <h2>Overview</h2>
+    <p>This application allows users to split PDF documents into individual files using a list of application numbers as file names for each split document. It's designed for streamlined and efficient document management, particularly useful when each file needs to be saved with a unique identifier.</p>
+</div>
+
+<div class="section">
+    <h2>How to Use</h2>
+    <ol>
+        <li>
+            <strong>Input Application Numbers</strong><br>
+            Enter your list of application numbers in the provided text area.<br>
+            Each number should be on a new line.<br>
+            Make sure there are <strong>no extra spaces</strong> before or after each application number.
+        </li>
+        <li>
+            <strong>Upload PDF File</strong><br>
+            Click on the "Upload" button to select the PDF you wish to split.
+        </li>
+        <li>
+            <strong>Submit</strong><br>
+            After ensuring your application numbers are correct, click the "Submit" button.<br>
+            The application will process each application number, splitting the PDF into individual files named after each respective number.
+        </li>
+        <li>
+            <strong>Download</strong><br>
+            Once the process is complete, a link to download the split files will be provided.<br>
+            Each file will be named according to the application number you entered.
+        </li>
+    </ol>
+</div>
+
+<div class="section">
+    <h2>Notes</h2>
+    <div class="note">
+        <p><strong>Formatting:</strong> Ensure each application number is a unique numeric identifier without spaces or special characters.</p>
+        <p><strong>File Limit:</strong> Large PDFs may take longer to process depending on the number of pages.</p>
+        <p><strong>Troubleshooting:</strong> If you encounter an error, double-check your application number format or try re-uploading your PDF file.</p>
+    </div>
+</div>
+
+<a href="#" class="download-link">Download Split Files</a>
+
+<footer>
+    <p>For further assistance, please contact the support team.</p>
+</footer>

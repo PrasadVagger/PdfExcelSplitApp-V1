@@ -90,12 +90,14 @@
             color: #721c24;
         }
     </style>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 </head>
 
 <body>
     <div class="container">
-        <h2>Welcome to Avia Automation Tool for PDF</h2>
-        <h2>Avia Backend Team Innovations</h2>
+        <h2 class="animate__heartBeat">SmartSort PDF Splitter</h2>
+        <h2 class="animate__heartBeat">Avia Backend Team Innovations</h2>
 
         @if (ViewBag.Message != null)
         {
@@ -109,7 +111,7 @@
                 <label for="pdfFile">Upload PDF</label>
                 <input type="file" class="form-control" name="pdfFile" id="pdfFile" />
             </div>
-
+            
             <div class="form-group">
                 <label for="applicationNumbers">Enter Application Numbers (one per line)</label>
                 <textarea class="form-control" name="applicationNumbers" id="applicationNumbers" rows="10" placeholder="Enter one application number per line" required></textarea>
@@ -140,8 +142,8 @@
                 $('#splitPdfForm').on('submit', function (e) {
                     e.preventDefault(); // Prevent page reload
 
-                    // Get the input value and trim spaces
-                    var applicationNumbers = $('#applicationNumbers').val().trim();
+                    // Get the input value without trimming spaces immediately
+                    var applicationNumbers = $('#applicationNumbers').val();
 
                     // Split the input into individual lines (numbers) and check for validation
                     var numbers = applicationNumbers.split('\n');
@@ -155,7 +157,7 @@
                         // Check if the number is only digits and not empty
                         if (!/^[0-9]+$/.test(num)) {
                             valid = false;
-                            errorMessage = "Each application number should contain only numbers and no spaces before or after.";
+                            errorMessage = "Each application number should contain only numbers with no spaces before or after each line.";
                             break;
                         }
                     }
@@ -193,14 +195,15 @@
                     });
                 });
 
-                // Trim spaces when the user finishes typing or when input changes
-                $('#applicationNumbers').on('input', function () {
-                    var input = $(this).val();
-                    var cleanInput = input.replace(/^\s+|\s+$/g, ''); // Remove spaces at the start and end
-                    $(this).val(cleanInput); // Update the textarea value
+                // Trim spaces only when the user finishes typing or when the form is submitted
+                $('#applicationNumbers').on('blur', function () {
+                    var input = $(this).val().split('\n').map(line => line.trim()).join('\n');
+                    $(this).val(input); // Update the textarea value with trimmed lines
                 });
             });
         </script>
+
+
 
     }
 </body>
